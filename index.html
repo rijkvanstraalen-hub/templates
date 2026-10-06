@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <title>Memory Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background: #1e1e2f;
+            color: white;
+        }
+
+        h1 {
+            margin-top: 20px;
+        }
+
+        #moves {
+            margin-bottom: 15px;
+        }
+
+        .game {
+            display: grid;
+            grid-template-columns: repeat(4, 100px);
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .card {
+            width: 100px;
+            height: 100px;
+            background: #4a4aff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2rem;
+            cursor: pointer;
+            border-radius: 10px;
+            user-select: none;
+        }
+
+        .flipped {
+            background: white;
+            color: black;
+        }
+    </style>
+</head>
+<body>
+
+<h1>🧠 Memory Game</h1>
+<p id="moves">Zetten: 0</p>
+
+<div class="game" id="game"></div>
+
+<script>
+const symbols = ['🍎','🍌','🍓','🍒','🍇','🥝','🍍','🍉'];
+let cards = [...symbols, ...symbols];
+cards.sort(() => Math.random() - 0.5);
+
+const game = document.getElementById('game');
+const movesText = document.getElementById('moves');
+
+let firstCard = null;
+let secondCard = null;
+let lockBoard = false;
+let moves = 0;
+let matched = 0;
+
+cards.forEach(symbol => {
+    const card = document.createElement('div');
+    card.classList.add('card');
+    card.dataset.symbol = symbol;
+    card.textContent = '?';
+
+    card.addEventListener('click', () => {
+        if (lockBoard || card.classList.contains('flipped')) return;
+
+        card.textContent = symbol;
+        card.classList.add('flipped');
+
+        if (!firstCard) {
+            firstCard = card;
+            return;
+        }
+
+        secondCard = card;
+        moves++;
+        movesText.textContent = `Zetten: ${moves}`;
+
+        if (firstCard.dataset.symbol === secondCard.dataset.symbol) {
+            matched += 2;
+
+            firstCard = null;
+            secondCard = null;
+
+            if (matched === cards.length) {
+                setTimeout(() => {
+                    alert(`Gewonnen! 🎉\nAantal zetten: ${moves}`);
+                }, 500);
+            }
+        } else {
+            lockBoard = true;
+
+            setTimeout(() => {
+                firstCard.textContent = '?';
+                secondCard.textContent = '?';
+
+                firstCard.classList.remove('flipped');
+                secondCard.classList.remove('flipped');
+
+                firstCard = null;
+                secondCard = null;
+                lockBoard = false;
+            }, 1000);
+        }
+    });
+
+    game.appendChild(card);
+});
+</script>
+
+</body>
+</html>
